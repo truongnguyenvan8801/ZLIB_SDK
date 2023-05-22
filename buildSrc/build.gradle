@@ -1,0 +1,21 @@
+apply plugin: 'java-gradle-plugin' // Allows us to create and configure plugin
+
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath "com.android.tools.build:gradle:7.3.1"
+    }
+}
+
+gradlePlugin {
+    plugins {
+        create("HelperPlugin") {
+            id = "com.zlib.helper-plugin"
+            implementationClass = "HelperPlugin"
+        }
+    }
+}
