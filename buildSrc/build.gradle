@@ -13,9 +13,22 @@ buildscript {
 
 gradlePlugin {
     plugins {
-        create("HelperPlugin") {
+        create("com.zlib.plugin.HelperPlugin") {
             id = "com.zlib.helper-plugin"
-            implementationClass = "HelperPlugin"
+            implementationClass = "com.zlib.plugin.HelperPlugin"
+        }
+        create("AnnotationProcessPlugin") {
+            id = "com.zlib.annotation-processor-plugin"
+            implementationClass = "com.zlib.plugin.AnnotationProcessorPlugin"
         }
     }
+}
+
+repositories {
+    google()
+    mavenCentral()
+}
+
+dependencies {
+    implementation('io.github.classgraph:classgraph:4.8.160')
 }

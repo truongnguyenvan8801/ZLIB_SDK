@@ -14,7 +14,7 @@ public class ZLibAppInitProvider implements Initializer<MyApp> {
     @NonNull
     @Override
     public MyApp create(@NonNull Context context) {
-        MyApp myApp = new MyApp();
+        MyApp myApp = new MyApp(context);
         ProcessLifecycleOwner.get().getLifecycle().addObserver(myApp);
         return myApp;
     }
