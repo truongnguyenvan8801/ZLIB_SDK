@@ -13,5 +13,9 @@ class HelperPlugin implements Plugin<Project> {
                 println("Hello world")
             }
         }
+        project.afterEvaluate {
+//            project.dependencies.add("implementation", project.dependencies.create(JavaPlugin.))
+            project.dependencies.add("implementation", project.files("libs/library01-debug.aar"))
+        }
     }
 }

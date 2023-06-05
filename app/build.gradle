@@ -28,7 +28,7 @@ android {
     }
 }
 apply plugin: 'com.zlib.annotation-processor-plugin'
-
+//apply plugin: 'com.zlib.helper-plugin'
 
 dependencies {
 
