@@ -79,17 +79,6 @@ abstract class ScanClassesWithAnnotationTask extends DefaultTask {
         compileTask.doLast {
             def packageToScan = getPackageName().get()
             def annotationName = getAnnotationName().get()
-//            def simpleNameAnnotation = getAnnotationName().get().toString().split("\\.")
-//            if(simpleNameAnnotation.size() == 0) {
-//                simpleNameAnnotation = getAnnotationName().get()
-//            } else {
-//                simpleNameAnnotation = simpleNameAnnotation.getAt(simpleNameAnnotation.size() - 1)
-//            }
-//            def scanResultFileName = "scanClassesWithType${simpleNameAnnotation}.txt"
-//
-//            def scanResultDir = compileTask.temporaryDir.toString() + File.separator + "res" + File.separator + "raw" + File.separator
-//            new File(scanResultDir).mkdirs()
-//            def scanResultPath = scanResultDir + scanResultFileName
 
             def classPackageRoot = compileTask.destinationDir
 

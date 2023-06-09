@@ -27,8 +27,8 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 }
-apply plugin: 'com.zlib.annotation-processor-plugin'
-//apply plugin: 'com.zlib.helper-plugin'
+//apply plugin: 'com.zlib.annotation-processor-plugin'
+apply plugin: 'com.zlib.helper-plugin'
 
 dependencies {
 
