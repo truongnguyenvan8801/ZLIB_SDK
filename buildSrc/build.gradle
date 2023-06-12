@@ -12,6 +12,14 @@ buildscript {
     }
 }
 
+sourceSets {
+    main {
+        java {
+            srcDirs += ['src/main/java', 'buildSrc/src/main/java']
+        }
+    }
+}
+
 gradlePlugin {
     plugins {
         create("com.zlib.plugin.HelperPlugin") {

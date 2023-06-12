@@ -5,6 +5,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.lang.annotation.Annotation;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -36,6 +37,7 @@ public class ZLibAnnotationProcessor extends AbstractProcessor {
             StringBuilder stringBuilder = new StringBuilder();
             for(Element element : roundEnvironment.getElementsAnnotatedWith((annotationClass.asSubclass(Annotation.class)))) {
                 String className = ((TypeElement) element).getQualifiedName().toString();
+                System.out.println(className);
                 stringBuilder.append(className).append("\n");
             }
 
@@ -55,5 +57,13 @@ public class ZLibAnnotationProcessor extends AbstractProcessor {
         }
 
         return false;
+    }
+
+    @Override
+    public Set<String> getSupportedAnnotationTypes() {
+        // Đăng ký sử dụng annotation AppModule
+        return new HashSet<String>(){{
+            add("com.zlib.annotation.AppModule");
+        }};
     }
 }

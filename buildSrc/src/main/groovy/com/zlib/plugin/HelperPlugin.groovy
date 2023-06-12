@@ -1,15 +1,28 @@
 package com.zlib.plugin
 
+import com.zlib.annotation_processor.ZLibAnnotationProcessor
 import groovy.xml.MarkupBuilder
+import org.gradle.api.DefaultTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.Task
+import org.gradle.api.plugins.JavaPlugin
+import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.compile.JavaCompile
+
+import javax.annotation.processing.AbstractProcessor
+import javax.tools.JavaCompiler
+import javax.tools.ToolProvider
 
 class HelperPlugin implements Plugin<Project> {
 
     @Override
     void apply(Project project) {
+
         project.task('hello') {
             dependsOn('build');
             doLast {
@@ -27,6 +40,7 @@ class HelperPlugin implements Plugin<Project> {
         }
 
         project.afterEvaluate {
+
             project.android.applicationVariants.all { variant ->
                 def buildDir = project.buildDir.path + "/generated/res/lib-services/"
                 def splitDirByBuildVariant = variant.name.toString().replaceAll("([a-z])([A-Z])", "${1}/${2}").toLowerCase()
@@ -54,11 +68,88 @@ class HelperPlugin implements Plugin<Project> {
 
             }
 
-            TaskProvider<JavaCompile> javaCompileTask = project.buildDir.resolve("generated/source/processors");
-            javaCompileTask = project.tasks.named("compileJava", JavaCompile)
-            javaCompileTask.configure(t -> {
-                options.annotationProcessorGeneratedSourcesDirectory = project.buildDir.resolve
-            })
+            def javaCompileTask = project.tasks.getByName("compileDebugJavaWithJavac")
+//            JavaCompiler compiler = ToolProvider.getSystemJavaCompiler()
+//            compiler.run(null, null, null, "-proc:only", "-processor")
+//            javaCompileTask.configure(t -> {
+//                t.sourceSets.main.java.srcDirs("src/main/java")
+//                t.options.annotationProcessorPath = project.configurations.annotationProcessor
+//                t.options.compilerArgs += [
+//                        '-proc:only',
+//                        "-AannotationName=com.zlib.annotation.AppModule",
+//                        "-s", project.buildDir.path + '/generated/sources/annotation-processor'
+//                ]
+//
+//                t.options.compilerArgs += [
+//                        '-processor', ZLibAnnotationProcessor.canonicalName
+//                ]
+//            })
+
+//            def scan = project.tasks.register("scanWithAnnotation", ScanWithAnnotationTask) {
+//                annotationProcessor.set(new ZLibAnnotationProcessor())
+//                annotationName.set("com.zlib.annotation.AppModule")
+//
+//            }
+//            javaCompileTask.dependsOn(scan.get())
+//            def jvaCompileTask = project.tasks.register("scanCustomTask", JavaCompile) {
+//                it.source = project.sourceSets.main.java
+//                it.classpath = project.configurations.compile +
+//            }
+            def compileDebugTask = project.tasks.getByName("compileDebugJavaWithJavac")
+            def scanWithAnnotation = project.tasks.register("scanWithAnnotation", ScanWithAnnotationTask) {
+                annotationProcessor.set(new ZLibAnnotationProcessor())
+                annotationName.set("com.zlib.annotation.AppModule")
+                compileTask.set(compileDebugTask)
+            }
+            compileDebugTask.dependsOn(scanWithAnnotation)
+
         }
+//        project.plugins.withType(JavaPlugin.class, javaPlugin -> {
+//            JavaCompile javaCompileTask = (JavaCompile) project.getTasks().getByName("compileJava");
+//            javaCompileTask.doLast(task -> {
+//                ZLibAnnotationProcessor annotationProcessor = new ZLibAnnotationProcessor();
+//                annotationProcessor.init(javaCompileTask.getProcessingEnvironment());
+//                annotationProcessor.process(javaCompileTask.getAnnotationProcessor().getSupportedAnnotationTypes(),
+//                        javaCompileTask.getAnnotationProcessor().getRoundEnvironment());
+//            });
+//
+//        })
+    }
+
+}
+
+
+
+abstract class ScanWithAnnotationTask extends DefaultTask {
+    @Input
+    abstract Property<AbstractProcessor> getAnnotationProcessor()
+
+    @Input
+    abstract Property<String> getAnnotationName()
+
+    @Internal
+    abstract Property<Task> getCompileTask()
+
+    @TaskAction
+    void scanClassesWithAnnotation() {
+        println ZLibAnnotationProcessor.class
+
+        def annotationProcessor = annotationProcessor.get()
+        def annotationName = annotationName.get()
+
+        println "Scanning classes with annotation: $annotationName"
+        def compileTask = compileTask.get()
+        def compileJavaOptions = compileTask.options
+        compileJavaOptions.compilerArgs += [
+                '-processor', "${project.buildDir}tmp/buildSrc/com/zlib/annotation_processor/ZLibAnnotationProcessor",
+                '-AannotationName=' + annotationName
+        ]
+//
+//        def javaCompileTask = project.tasks.getByName("compileDebugJavaWithJavac")
+//        javaCompileTask.doLast {
+//            JavaCompiler compiler = ToolProvider.getSystemJavaCompiler()
+//            compiler.run(null, null, null, "-proc:only", "-processor", annotationProcessor.get().getClass().getName(), "-AannotationName=" + annotationName.get())
+//        }
+
     }
 }
